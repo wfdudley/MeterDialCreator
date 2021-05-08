@@ -19,6 +19,18 @@ tick_width_S=1.0
 docu_color=svgwrite.rgb(10, 10, 16, '%')
 docu_width=0.5
 
+# if you want red 'X' labels, leave dummy_labels set to 1
+# for "real" labels, change dummy_labels=0
+# if dummy_labels == 0, then:
+#    rotate_text turns on/off rotating the text to match the angle of the tics
+#    you must fill label_array[] with the values/strings of your lables, before full_label() is called
+#    set debug_labels=1 to see the labels printed out to console as they are put in the svg
+# the "demo" labels work "correctly" in either mode: real or dummy
+dummy_labels=1
+rotate_text=0
+label_array=[]
+debug_labels=0
+
 # a constant for approximate sizing
 szfactor=5.64
 
@@ -174,9 +186,18 @@ def full_label(h, p):
         a=a*360/(2*math.pi)
         rotate.append(a)
         x,y = toxy(h, (i/(p-1)))
-        dwg.add(dwg.text(
-            "x", insert=(x, y), fill='red', rotate=rotate)
-        )
+        if dummy_labels>0:
+            dwg.add(dwg.text( 'x', insert=(x, y), fill='red', rotate=rotate))
+        else:
+            if rotate_text>0:
+                if debug_labels>0:
+                    print(i, " -> ", label_array[i])
+                dwg.add(dwg.text( label_array[i], insert=(x, y), fill='black', rotate=rotate))
+
+            else:
+                if debug_labels>0:
+                    print(i, " -> ", label_array[i])
+                dwg.add(dwg.text( label_array[i], insert=(x, y), fill='black'))
 
 ################# create output file #######################
 
@@ -194,6 +215,10 @@ dwg.add(dwg.line((0, -1), (0, 1), stroke=docu_color, stroke_width=docu_width))
 # have a total of 31 ticks (i.e. per half degree)
 # every 10 ticks (5 deg C) for large markings
 # every 2 ticks (1 deg C) for medium markings
+
+for i in range (15,31):
+     label_array.append(i)
+
 h=265 # 265 / 5.64 = 47mm 
 full_arc(h, 31)
 full_ticks(h, 31, 10, 5, 4, 10, 2)
@@ -210,6 +235,12 @@ for i in range (0,sectors):
 
 # Humidity indication:
 # sector style. 20-90 percent RH, this is a total of 7 sectors
+
+label_array=[]
+for i in range (2,10):
+     label_array.append(i * 10)
+label_array[6]="%RH"
+
 h=225
 sectors=7
 for i in range (0,sectors):
@@ -223,6 +254,9 @@ sector(h, 10, 6, 8, sectors)
 # VOC indication:
 # traditional meter style, but with log ticks
 # need 5 decades
+
+label_array=["1", "10", "100", "1K", "VOC", "100k"]
+
 h=185
 full_arc(h, 51)
 log_full_ticks(h, 5, 10, 4, 4)
@@ -234,6 +268,9 @@ sector(h, 10, 6, 0, sectors)
 # Co2 indication:
 # traditional meter style, but with log ticks
 # need 3 decades
+
+label_array=["1K", "10K", "CO2", "100k"]
+
 h=145
 full_arc(h, 61)
 log_full_ticks(h, 3, 10, 4, 4)
