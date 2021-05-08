@@ -30,6 +30,7 @@ dummy_labels=1
 rotate_text=0
 label_array=[]
 debug_labels=0
+label_x_fudge=[]
 
 # a constant for approximate sizing
 szfactor=5.64
@@ -180,15 +181,36 @@ def log_full_ticks(h, d, len_L, len_M, len_S):
 
 # text labels at height h, total of p points.
 def full_label(h, p):
+    if dummy_labels==0:
+        # compute the x fudge factors based on outer end of tick mark
+        for i in range (0, p):
+            x,y = toxy(h, (i/(p-1)))
+            x1,y1=toxy(h+big_tick_length, (i/(p-1)))
+            label_x_fudge.append(x1-x)
+        # adjust values so right-most x fudge factor is 0.0
+        max_x1=label_x_fudge[p-1]
+        for i in range (0, p):
+            label_x_fudge[i]=label_x_fudge[i]-max_x1
+        if debug_labels>0:
+            print(label_x_fudge)
     for i in range (0, p):
         rotate=[]
         a=((i/(p-1))*mechangle) - (mechangle/2)
+        if debug_labels>0:
+            print("a1 =", a)
         a=a*360/(2*math.pi)
+        if debug_labels>0:
+            print("a2 =", a)
         rotate.append(a)
         x,y = toxy(h, (i/(p-1)))
         if dummy_labels>0:
             dwg.add(dwg.text( 'x', insert=(x, y), fill='red', rotate=rotate))
         else:
+            if debug_labels>0:
+                print("before fudge h =", h, ", i/(p-1) =", i/(p-1), ", x =", x, " y =", y)
+            x=x+label_x_fudge[i]
+            if debug_labels>0:
+                print("after fudge  h =", h, ", i/(p-1) =", i/(p-1), ", x =", x, " y =", y)
             if rotate_text>0:
                 if debug_labels>0:
                     print(i, " -> ", label_array[i])
@@ -222,6 +244,7 @@ for i in range (15,31):
 h=265 # 265 / 5.64 = 47mm 
 full_arc(h, 31)
 full_ticks(h, 31, 10, 5, 4, 10, 2)
+big_tick_length=10
 full_label(h+12, 16)
 # partial arcs, ideal for adornment on a meter dial, etc
 #for i in range (0,15):
@@ -245,6 +268,7 @@ h=225
 sectors=7
 for i in range (0,sectors):
     sector(h, 10, 6, i, sectors)
+label_x_fudge=[]
 full_label(h+12, 8)
 # half-sectors for shading in green:
 sectors=14
@@ -260,6 +284,7 @@ label_array=["1", "10", "100", "1K", "VOC", "100k"]
 h=185
 full_arc(h, 51)
 log_full_ticks(h, 5, 10, 4, 4)
+label_x_fudge=[]
 full_label(h+12, 6)
 # no safe definition for general VOC, but a sector will be shown for less than 27 ppb (formaldehyde):
 sectors=3.5
@@ -274,6 +299,7 @@ label_array=["1K", "10K", "CO2", "100k"]
 h=145
 full_arc(h, 61)
 log_full_ticks(h, 3, 10, 4, 4)
+label_x_fudge=[]
 full_label(h+12, 4)
 # 250-1000ppm is good. The settings below will draw a sector for 300-1000ppm which is good enough
 sectors=6
