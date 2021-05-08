@@ -31,6 +31,8 @@ rotate_text=0
 label_array=[]
 debug_labels=0
 label_x_fudge=[]
+xoffset=0
+yoffset=0
 
 # a constant for approximate sizing
 szfactor=5.64
@@ -42,8 +44,8 @@ szfactor=5.64
 # ang_n is between 0 (min deflection) and 1 (max deflection)
 def toxy(h, ang_n):
     a=(ang_n*mechangle) - (mechangle/2)
-    y=0-math.cos(a)*h
-    x=math.sin(a)*h
+    y=yoffset + 0 - math.cos(a)*h
+    x=xoffset + math.sin(a)*h
     return x, y
 
 # draw a full arc at height h, with p points
@@ -225,8 +227,8 @@ def full_label(h, p):
 
 dwg = svgwrite.Drawing('out.svg', profile='tiny')
 # add crosshair at meter spindle
-dwg.add(dwg.line((-1, 0), (1, 0), stroke=docu_color, stroke_width=docu_width))
-dwg.add(dwg.line((0, -1), (0, 1), stroke=docu_color, stroke_width=docu_width))
+dwg.add(dwg.line((-1+xoffset, yoffset), (1+xoffset, yoffset), stroke=docu_color, stroke_width=docu_width))
+dwg.add(dwg.line((xoffset, -1+yoffset), (xoffset, 1+yoffset), stroke=docu_color, stroke_width=docu_width))
 
 
 ################ main code #################################
