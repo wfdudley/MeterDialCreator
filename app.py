@@ -23,7 +23,7 @@ docu_width=0.5
 # for "real" labels, change dummy_labels=0
 # if dummy_labels == 0, then:
 #    rotate_text turns on/off rotating the text to match the angle of the tics
-#    you must fill label_array[] with the values/strings of your lables, before full_label() is called
+#    you must fill label_array[] with the values/strings of your labels, before full_label() is called
 #    set debug_labels=1 to see the labels printed out to console as they are put in the svg
 # the "demo" labels work "correctly" in either mode: real or dummy
 dummy_labels=1
